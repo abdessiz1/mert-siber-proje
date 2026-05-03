@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Siber Güncelleme | Düzenle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #05070a;
+            background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(125,95,255,0.12), transparent);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        .card {
+            background: rgba(20, 24, 33, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            border: 1px solid #7d5fff;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 36px;
+            box-shadow: 0 0 60px rgba(125, 95, 255, 0.3);
+            animation: fadeInUp 0.5s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header { text-align: center; margin-bottom: 32px; }
+        .header-icon { font-size: 3rem; background: linear-gradient(135deg, #7d5fff, #5a3fcc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+        .header h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, #ffffff 30%, #7d5fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #6b7280; font-size: 0.85rem; margin-top: 8px; }
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #7d5fff; }
+        .form-group label i { margin-right: 8px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 16px; color: #6b7280; font-size: 1rem; pointer-events: none; }
+        input, select {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            background: #0c0e14;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+        input:focus, select:focus { border-color: #7d5fff; box-shadow: 0 0 0 3px rgba(125, 95, 255, 0.2); }
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #7d5fff, #5a3fcc);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+            transition: all 0.25s ease;
+        }
+        .btn-submit:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(125, 95, 255, 0.4); }
+        .footer-link { text-align: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .footer-link a { color: #6b7280; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .footer-link a:hover { color: #7d5fff; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <div class="header-icon"><i class="fas fa-user-edit"></i></div>
+            <h2>Kayıt Düzenle</h2>
+            <p><i class="fas fa-pen-fancy"></i> Bilgileri güncelleyin</p>
+        </div>
+        <form method="POST">
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> KATEGORİ</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-users"></i>
+                    <select name="unvan">
+                        <option value="Öğrenci" {% if kisi.Unvan == 'Öğrenci' %}selected{% endif %}>🎓 Öğrenci</option>
+                        <option value="Öğretmen" {% if kisi.Unvan == 'Öğretmen' %}selected{% endif %}>👨‍🏫 Öğretmen</option>
+                        <option value="Veli" {% if kisi.Unvan == 'Veli' %}selected{% endif %}>👨‍👩‍👧 Veli</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> AD</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-circle"></i>
+                    <input type="text" name="ad" value="{{ kisi.Ad }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> SOYAD</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-circle"></i>
+                    <input type="text" name="soyad" value="{{ kisi.Soyad }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-id-card"></i> NUMARA / TC</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-hashtag"></i>
+                    <input type="text" name="numara" value="{{ kisi.Numara_TC }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> GÜNCELLEMEYİ ONAYLA</button>
+        </form>
+        <div class="footer-link"><a href="/"><i class="fas fa-arrow-left"></i> Vazgeç ve Ana Sayfaya Dön</a></div>
+    </div>
+</body>
+</html>

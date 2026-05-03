@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Siber Panel PRO | v3.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #05070a;
+            --card-bg: rgba(20, 24, 33, 0.85);
+            --accent: #7d5fff;
+            --accent-glow: rgba(125, 95, 255, 0.45);
+            --success: #00ff9d;
+            --danger: #ff4757;
+            --warning: #ff9f43;
+            --text: #dde3ed;
+            --muted: #6b7280;
+            --border: rgba(255,255,255,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(125,95,255,0.18), transparent);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1340px; margin: 0 auto; padding: 40px 24px; }
+
+        .hero { text-align: center; margin-bottom: 48px; }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 18px var(--accent-glow));
+        }
+        .hero p { color: var(--muted); margin-top: 8px; letter-spacing: 2px; }
+
+        .dashboard { display: grid; grid-template-columns: 1fr 320px; gap: 28px; margin-bottom: 36px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px 20px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            transition: .3s;
+        }
+        .stat-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px var(--accent-glow); border-color: var(--accent); }
+        .stat-card h3 { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-card p { font-size: 2.6rem; font-weight: 800; color: #fff; margin: 8px 0 0; }
+
+        .chart-wrap {
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Excel Upload */
+        .upload-zone {
+            border: 2px dashed rgba(125,95,255,.5);
+            border-radius: 18px;
+            padding: 20px 28px;
+            background: rgba(125,95,255,.06);
+            margin-bottom: 28px;
+            transition: .3s;
+        }
+        .upload-zone:hover { border-color: var(--accent); background: rgba(125,95,255,.12); }
+        .upload-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 13px 28px;
+            background: var(--accent);
+            border-radius: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .progress-wrap { margin-top: 14px; display: none; }
+        .progress-track {
+            background: rgba(255,255,255,.08);
+            border-radius: 99px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 99px;
+            transition: width .4s ease;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 13px 18px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .search-box:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+
+        .filter-select, .sort-select {
+            padding: 13px 18px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            color: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: .25s;
+        }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warn { background: var(--warning); color: black; }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #111327;
+            min-width: 160px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            z-index: 100;
+        }
+        .dropdown-content a {
+            color: var(--text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 12px;
+        }
+        .dropdown-content a:hover { background: rgba(125,95,255,0.2); color: var(--accent); }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        .table-wrapper {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(14px);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: rgba(0,0,0,.35); padding: 16px 18px; text-align: left; color: var(--accent); font-size: .75rem; text-transform: uppercase; }
+        td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,.04); }
+        tr:hover td { background: rgba(255,255,255,.02); }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+        .badge-ogrenci { background: rgba(0,229,160,.15); color: var(--success); }
+        .badge-ogretmen { background: rgba(125,95,255,.2); color: #a98bff; }
+        .badge-veli { background: rgba(255,159,67,.15); color: var(--warning); }
+
+        .edit-link { color: var(--accent); font-size: 1rem; margin-left: 8px; text-decoration: none; }
+        .edit-link:hover { color: #fff; }
+
+        .flash-box {
+            padding: 14px 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .flash-success { background: rgba(0,229,160,.15); border: 1px solid var(--success); color: var(--success); }
+        .flash-info { background: rgba(125,95,255,.15); border: 1px solid var(--accent); color: #a98bff; }
+        .flash-danger { background: rgba(255,71,87,.15); border: 1px solid var(--danger); color: #ff8a95; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: linear-gradient(145deg, #111327 0%, #0a0c16 100%);
+            border: 1px solid var(--accent);
+            border-radius: 28px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            animation: modalIn .3s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal-icon { font-size: 3.5rem; margin-bottom: 16px; }
+        .modal h3 { color: var(--warning); font-size: 1.5rem; margin-bottom: 12px; }
+        .modal-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 20px; }
+        .modal-buttons button {
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-confirm { background: linear-gradient(135deg, var(--danger), #b91c1c); color: white; }
+        .btn-cancel { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.15); }
+
+        @media (max-width: 900px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+            .action-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="hero">
+        <h1>SİBER PANEL <span style="-webkit-text-fill-color:#7d5fff">PRO</span></h1>
+        <p>SQLITE · EXCEL ENTEGRASYON · v3.0</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash-box flash-{{ cat }}">
+        <i class="fas fa-{% if cat=='success' %}check-circle{% elif cat=='danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+        {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+
+    <div class="dashboard">
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Toplam</h3><p>{{ stats.toplam }}</p></div>
+            <div class="stat-card"><h3>Öğretmen</h3><p>{{ stats.ogretmen }}</p></div>
+            <div class="stat-card"><h3>Öğrenci</h3><p>{{ stats.ogrenci }}</p></div>
+            <div class="stat-card"><h3>Veli</h3><p>{{ stats.veli }}</p></div>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="mainChart" style="max-height:200px"></canvas>
+        </div>
+    </div>
+
+    <!-- Excel Yükleme -->
+    <div class="upload-zone">
+        <div class="upload-top" style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <label class="upload-label" for="excelInput">
+                <i class="fas fa-file-excel"></i> Excel Yükle
+            </label>
+            <div class="upload-info" style="color: var(--muted); font-size: 0.8rem;">
+                Sütunlar: <code>Unvan</code> <code>Ad</code> <code>Soyad</code> <code>Numara_TC</code>
+            </div>
+            <div class="dropdown" style="margin-left:auto">
+                <button class="btn btn-outline"><i class="fas fa-download"></i> Rapor İndir ▼</button>
+                <div class="dropdown-content">
+                    <a href="/rapor_excel"><i class="fas fa-file-excel" style="color: #00e5a0"></i> Excel (.xlsx)</a>
+                    <a href="/rapor_csv"><i class="fas fa-file-csv" style="color: #ff9f43"></i> CSV (.csv)</a>
+                    <a href="/rapor_pdf"><i class="fas fa-file-pdf" style="color: #ff4757"></i> PDF (.pdf)</a>
+                </div>
+            </div>
+        </div>
+        <div class="progress-wrap" id="progressWrap">
+            <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+            <div class="progress-text" id="progressText" style="color: var(--muted); font-size: 0.8rem;">Yükleniyor...</div>
+        </div>
+        <input type="file" id="excelInput" accept=".xlsx,.xls" hidden>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Ara (Ad, Soyad, TC, Ünvan)...">
+        <select id="filterUnvan" class="filter-select">
+            <option value="all">🏷️ Tüm Ünvanlar</option>
+            <option value="Öğrenci">🎓 Öğrenci</option>
+            <option value="Öğretmen">👨‍🏫 Öğretmen</option>
+            <option value="Veli">👨‍👩‍👧 Veli</option>
+        </select>
+        <select id="sortBy" class="sort-select">
+            <option value="ad_asc">🔤 Ada Göre (A-Z)</option>
+            <option value="ad_desc">🔤 Ada Göre (Z-A)</option>
+            <option value="soyad_asc">📝 Soyada Göre (A-Z)</option>
+            <option value="soyad_desc">📝 Soyada Göre (Z-A)</option>
+        </select>
+        <a href="/ekle" class="btn btn-accent"><i class="fas fa-plus"></i> YENİ KAYIT</a>
+    </div>
+
+    <!-- Silme Butonları -->
+    <form action="/coklu_sil" method="POST" id="cokluSilForm">
+        <div style="margin-bottom:14px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Seçilenleri Sil</button>
+            <button type="button" class="btn btn-warn" onclick="hepsiniSec()"><i class="fas fa-check-square"></i> Tümünü Seç</button>
+            <button type="button" class="btn btn-danger" style="background:#8b0000" onclick="sifirlamaModalGoster()">
+                <i class="fas fa-bomb"></i> Listeyi Sıfırla
+            </button>
+        </div>
+    </form>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+        <table id="dataTable">
+            <thead>
+                <tr><th width="50">SEÇ</th><th>ÜNVAN</th><th>AD</th><th>SOYAD</th><th>NUMARA / TC</th><th width="90">İŞLEM</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for v in veriler %}
+                <tr data-unvan="{{ v.Unvan }}" data-ad="{{ v.Ad }}" data-soyad="{{ v.Soyad }}" data-id="{{ v.ID }}">
+                    <td><input type="checkbox" name="secili_id" value="{{ v.ID }}" class="row-cb" form="cokluSilForm"></td>
+                    <td><span class="badge badge-{{ v.Unvan|lower|replace('ö','o') }}">{{ v.Unvan }}</span></td>
+                    <td><strong>{{ v.Ad }}</strong></td><td>{{ v.Soyad }}</td>
+                    <td><code style="color:#a98bff">{{ v.Numara_TC }}</code></td>
+                    <td><a href="/guncelle/{{ v.ID }}" class="edit-link"><i class="fas fa-user-edit"></i></a>
+                        <a href="/sil/{{ v.ID }}" class="edit-link" style="color:var(--danger)"><i class="fas fa-trash"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SIFIRLAMA MODAL -->
+<div class="modal-overlay" id="sifirlamaModal">
+    <div class="modal">
+        <div class="modal-icon">💀</div>
+        <h3 style="color: var(--danger);">TÜM LİSTEYİ SIFIRLA</h3>
+        <p><strong>{{ stats.toplam }}</strong> kayıt tamamen silinecek.<br>Bu işlem <strong>GERİ ALINAMAZ!</strong></p>
+        <div class="modal-buttons">
+            <form action="/temizle" method="POST">
+                <button type="submit" class="btn-confirm">✅ EVET, SIFIRLA</button>
+            </form>
+            <button class="btn-cancel" onclick="sifirlamaModalKapat()">❌ VAZGEÇ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chart
+new Chart(document.getElementById('mainChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['Öğretmen','Öğrenci','Veli'],
+            datasets: [{ data: [{{ stats.ogretmen }}, {{ stats.ogrenci }}, {{ stats.veli }}],
+                         backgroundColor: ['#7d5fff','#00e5a0','#ff9f43'], borderWidth: 0 }] },
+    options: { maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position:'bottom', labels:{ color:'#888' } } } }
+});
+
+// Filtreleme ve Sıralama
+function filterAndSort() {
+    let rows = Array.from(document.querySelectorAll('#tableBody tr'));
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filterUnvan = document.getElementById('filterUnvan').value;
+    const sortBy = document.getElementById('sortBy').value;
+    
+    rows = rows.filter(row => {
+        const ad = row.getAttribute('data-ad')?.toLowerCase() || '';
+        const soyad = row.getAttribute('data-soyad')?.toLowerCase() || '';
+        const unvan = row.getAttribute('data-unvan') || '';
+        const fullName = ad + ' ' + soyad;
+        const matchesSearch = fullName.includes(searchTerm) || ad.includes(searchTerm) || soyad.includes(searchTerm);
+        const matchesUnvan = filterUnvan === 'all' || unvan === filterUnvan;
+        return matchesSearch && matchesUnvan;
+    });
+    
+    rows.sort((a, b) => {
+        const adA = a.getAttribute('data-ad') || '';
+        const adB = b.getAttribute('data-ad') || '';
+        const soyadA = a.getAttribute('data-soyad') || '';
+        const soyadB = b.getAttribute('data-soyad') || '';
+        if (sortBy === 'ad_asc') return adA.localeCompare(adB, 'tr');
+        if (sortBy === 'ad_desc') return adB.localeCompare(adA, 'tr');
+        if (sortBy === 'soyad_asc') return soyadA.localeCompare(soyadB, 'tr');
+        if (sortBy === 'soyad_desc') return soyadB.localeCompare(soyadA, 'tr');
+        return 0;
+    });
+    
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+document.getElementById('searchInput').addEventListener('input', filterAndSort);
+document.getElementById('filterUnvan').addEventListener('change', filterAndSort);
+document.getElementById('sortBy').addEventListener('change', filterAndSort);
+
+function hepsiniSec() {
+    const cbs = document.querySelectorAll('.row-cb');
+    const allChecked = Array.from(cbs).every(cb => cb.checked);
+    cbs.forEach(cb => cb.checked = !allChecked);
+}
+
+function sifirlamaModalGoster() {
+    const toplam = parseInt('{{ stats.toplam }}') || 0;
+    if (toplam === 0) { alert('⚠️ Listede kayıt yok!'); return; }
+    document.getElementById('sifirlamaModal').classList.add('active');
+}
+function sifirlamaModalKapat() { document.getElementById('sifirlamaModal').classList.remove('active'); }
+
+// Excel Yükleme
+document.getElementById('excelInput').addEventListener('change', function() {
+    const dosya = this.files[0];
+    if (!dosya) return;
+    const wrap = document.getElementById('progressWrap');
+    const bar = document.getElementById('progressBar');
+    wrap.style.display = 'block';
+    bar.style.width = '0%';
+    let p = 0;
+    const iv = setInterval(() => { p = Math.min(p + 15, 85); bar.style.width = p + '%'; }, 120);
+    const fd = new FormData();
+    fd.append('file', dosya);
+    this.value = '';
+    fetch('/excel_yukle', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+            clearInterval(iv);
+            bar.style.width = '100%';
+            setTimeout(() => { wrap.style.display = 'none'; location.reload(); }, 1000);
+        })
+        .catch(() => { clearInterval(iv); wrap.style.display = 'none'; alert('Hata!'); });
+});
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') sifirlamaModalKapat(); });
+</script>
+</body>
+</html>
