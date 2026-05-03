@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Siber Silme | Onay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg:        #05070a;
+            --card-bg:   rgba(20, 24, 33, 0.95);
+            --accent:    #ff4757;
+            --accent-glow: rgba(255, 71, 87, 0.4);
+            --text:      #dde3ed;
+            --muted:     #6b7280;
+            --border:    rgba(255,255,255,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,71,87,0.12), transparent);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            border: 1px solid var(--accent);
+            width: 100%;
+            max-width: 480px;
+            padding: 48px 36px;
+            text-align: center;
+            box-shadow: 0 0 60px var(--accent-glow);
+            animation: fadeInUp 0.5s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card:hover { box-shadow: 0 0 80px var(--accent-glow); }
+        .icon-danger {
+            font-size: 4.5rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(255,71,87,0.5);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+        .user-info {
+            background: rgba(255,71,87,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 24px 0;
+            border: 1px solid rgba(255,71,87,0.3);
+        }
+        .user-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .user-detail {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        .user-detail i {
+            margin: 0 4px;
+            color: var(--accent);
+        }
+        .warning-text {
+            color: #ff8a95;
+            font-size: 0.85rem;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent), #b91c1c);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+        .btn-danger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255,71,87,0.5);
+        }
+        .btn-cancel {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 14px 28px;
+            border-radius: 40px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.15);
+            transform: scale(1.02);
+        }
+        @media (max-width: 500px) {
+            .card { padding: 32px 24px; }
+            .button-group { flex-direction: column; }
+            .btn-danger, .btn-cancel { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-danger">
+            <i class="fas fa-skull-crossbones"></i>
+        </div>
+        <h2>KALICI SİLME</h2>
+        <div class="user-info">
+            <div class="user-name">
+                <i class="fas fa-user"></i> {{ kisi.Ad }} {{ kisi.Soyad }}
+            </div>
+            <div class="user-detail">
+                <i class="fas fa-tag"></i> {{ kisi.Unvan }} &nbsp;|&nbsp;
+                <i class="fas fa-id-card"></i> {{ kisi.Numara_TC }}
+            </div>
+        </div>
+        <div class="warning-text">
+            <i class="fas fa-exclamation-triangle"></i> Bu kayıt sistemden tamamen silinecek.<br>
+            <strong>Bu işlem GERİ ALINAMAZ!</strong>
+        </div>
+        <form method="POST">
+            <div class="button-group">
+                <button type="submit" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> EVET, KALICI SİL
+                </button>
+                <a href="/" class="btn-cancel">
+                    <i class="fas fa-times"></i> HAYIR, VAZGEÇ
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
